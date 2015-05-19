@@ -14,14 +14,13 @@
       <schema name="common" />
       <schema name="dublincore" />
       <schema name="uid" />
+      <schema name="content_view_display" />
     </facet>
 
     <!-- For default search -->
     <doctype name="DefaultSearch" extends="Document">
       <facet name="SavedSearch" />
-      <facet name="ContentViewDisplay" />
       <facet name="HiddenInNavigation" />
-      <schema name="default_search" />
     </doctype>
 
   </extension>

@@ -247,8 +247,7 @@ public class SearchUIActions implements Serializable {
             }
         }
         DocumentModel savedSearch = documentManager.getDocument(new IdRef(selectedSavedSearchId));
-        String contentViewName = (String) savedSearch.getPropertyValue("cvd:contentViewName");
-        loadSavedSearch(contentViewName, savedSearch);
+        loadSavedSearch(savedSearch);
     }
 
     protected void resetCurrentContentViewWorkingList() {
@@ -258,9 +257,14 @@ public class SearchUIActions implements Serializable {
         }
     }
 
-    public void loadSavedSearch(String contentViewName, DocumentModel searchDocument) throws ClientException {
+    public void loadSavedSearch(DocumentModel searchDocument) throws ClientException {
+        SearchUIService searchUIService = Framework.getService(SearchUIService.class);
+        ContentViewState contentViewState = searchUIService.loadSearch(searchDocument);
+        String contentViewName = contentViewState.getContentViewName();
         ContentView contentView = contentViewActions.getContentView(contentViewName, searchDocument);
         if (contentView != null) {
+            ContentViewService contentViewService = Framework.getService(ContentViewService.class);
+            contentViewService.restoreContentViewState(contentView, contentViewState);
             currentContentViewName = contentViewName;
             currentSelectedSavedSearchId = searchDocument.getId();
         }
@@ -367,8 +371,9 @@ public class SearchUIActions implements Serializable {
     public String saveSearch() throws ClientException {
         ContentView contentView = contentViewActions.getContentView(getCurrentContentViewName());
         if (contentView != null) {
+            ContentViewState state = contentViewService.saveContentView(contentView);
             SearchUIService searchUIService = Framework.getService(SearchUIService.class);
-            DocumentModel savedSearch = searchUIService.saveSearch(documentManager, contentView, savedSearchTitle);
+            DocumentModel savedSearch = searchUIService.saveSearch(documentManager, state, savedSearchTitle);
             currentSelectedSavedSearchId = savedSearch.getId();
 
             savedSearchTitle = null;
